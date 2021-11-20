@@ -24,7 +24,8 @@ app.get('/',(req,res)=>{
     if(req.session.loggedin){
         res.render('index',{
             login:true,
-            name:req.session.name
+            name:req.session.name.charAt(0).toUpperCase() + req.session.name.slice(1),
+            rol: req.session.rolName
         })
     }
     else{
@@ -40,7 +41,13 @@ app.get('/login',(req,res)=>{
 })
 
 app.get('/register',(req,res)=>{
-    res.render('register');
+    if(req.session.loggedin && req.session.rol==0){
+        res.render('register');
+    }
+    else{
+        res.redirect('/')
+    }
+    
 })
 
 app.get('/logout',(req,res)=>{
@@ -123,6 +130,16 @@ app.post('/auth', async(req,res)=>{
             else{
                 req.session.loggedin = true;
                 req.session.name = results[0].name
+                req.session.rol = results[0].rol
+                if(req.session.rol==0){
+                    req.session.rolName = 'Admin'
+                }
+                if(req.session.rol==2){
+                    req.session.rolName = 'Medico'
+                }
+                if(req.session.rol==3){
+                    req.session.rolName = 'Ayudante'
+                }
                 res.render('login',{
                     alert:true,
                     alertTitle: 'Excelente',

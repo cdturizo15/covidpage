@@ -25,8 +25,20 @@
     <div class="d-flex vw-100 vh-100 text-center justify-content-center align-items-center">
         <div class="container w-auto bg-black bg-opacity-50  mt-3 p-3 rounded shadow text-center align-content-center">
             <% if(login) { %>
-                <h1 class="fw-bold text-center text-white">El conectado es:<%= name %></h1>
+                <h1 class="fw-bold text-center text-white">El conectado es: <%= name %></h1>
+                <h1 class="fw-bold text-center text-white">Su rol es: <%= rol %></h1>
                 <a href="logout" class="btn btn-outline-light">Salir sesion</a>
+                <% if(rol=='Admin') { %>
+                    <a href="register" class="btn btn-outline-light">Registrar</a>
+                <% } %>
+                <% if(rol=='Ayudante') { %>
+                    <a href="registerCase" class="btn btn-outline-light">Registrar</a>
+                    <a href="modifyCase" class="btn btn-outline-light">Gestionar</a>
+                <% } %>
+                <% if(rol=='Medico') { %>
+                    <a href="search" class="btn btn-outline-light">Buscar</a>
+                    <a href="map" class="btn btn-outline-light">Mapa</a>
+                <% } %>
             <% } else{ %>
                 <h1 class="fw-bold text-center text-white">Bienvenido</h1>
                 <a href="login" class="btn btn-outline-light">Iniciar sesion</a>
