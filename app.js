@@ -51,6 +51,16 @@ app.get('/register',(req,res)=>{
     
 })
 
+app.get('/registerCase',(req,res)=>{
+    if(req.session.loggedin && req.session.rol==3){
+        res.render('registerCase');
+    }
+    else{
+        res.redirect('/')
+    }
+    
+})
+
 app.get('/logout',(req,res)=>{
     req.session.destroy(()=>{
         res.redirect('/')
