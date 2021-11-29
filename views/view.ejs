@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin=""/>
+        <link rel="stylesheet" href="resources/css/view.css">
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Uceva: Visualization</title>
+    </head>
+
+    <body>
+        <div id="masterContainer" class="container-fluid">
+            <div class="navbar container-fluid">
+                <div class="left-container">
+                    <div class="logo-container-div container">
+
+                    </div>
+                    <div class="form-container container">
+                        <div id="search-form" class="form">
+                            <div class="specific-search-div">
+                                <div class="search-value-general">
+                                    <div class="icon-container">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                                            <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                            <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="search-value-container">
+                                        <input type="text" id="patient_id" class="search-value" placeholder="ID paciente">
+                                        <button id="submit_btn1" class="submit_btn">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="search-value-general">
+                                    <div class="icon-container">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+                                            <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="search-value-container">
+                                        <input type="text" id="case_id" class="search-value" placeholder="ID caso">
+                                        <button id="submit_btn2" class="submit_btn">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button id="general_btn">General</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--Aquí termina el encabezado-->
+            <div id="mapa" style="height:80vh; margin-top: 10px;">
+                <div id="response-div" class="leaflet-top leaflet-right">
+                    <div class="response-field-container">
+                        <div class="response-field-name">First name:</div>
+                        <div id="response-name" class="response-field-value"></div>
+                    </div>
+                    <div class="response-field-container">
+                        <div class="response-field-name">Patient ID:</div>
+                        <div id="response-Id" class="response-field-value"></div>
+                    </div>
+                    <div class="response-field-container">
+                        <div class="response-field-name">Gender:</div>
+                        <div id="response-gender" class="response-field-value"></div>
+                    </div>
+                    <div class="response-field-container">
+                        <div class="response-field-name">Birth date:</div>
+                        <div id="response-birth_date" class="response-field-value"></div>
+                    </div>
+                    <div class="response-field-container">
+                        <div class="response-field-name">Address:</div>
+                        <div id="response-address" class="response-field-value"></div>
+                    </div>
+                    <div class="response-field-container">
+                        <div class="response-field-name">Job address:</div>
+                        <div id="response-job_address" class="response-field-value"></div>
+                    </div>
+                    <div class="response-field-container">
+                        <div class="response-field-name">Last state:</div>
+                        <div id="response-result" class="response-field-value"></div>
+                    </div>
+                    <div class="response-field-container">
+                        <div class="response-field-name">Test date:</div>
+                        <div id="response-result_date" class="response-field-value"></div>
+                    </div>
+                    <div class="response-field-container">
+                        <div class="response-field-name">Case ID:</div>
+                        <div id="response-caseId" class="response-field-value"></div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+        <script src="resources/scripts/view.js"></script>
+    </body>
+</html>

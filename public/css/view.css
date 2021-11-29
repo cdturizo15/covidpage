@@ -1,0 +1,146 @@
+body{
+    background: url('../img/loginBackground.png');
+    background-size: 100vw 100vh;
+    padding: 0px;
+}
+
+#masterContainer{
+    padding: 0px;
+}
+
+.navbar{
+    height: 170px;
+    background-color: white;
+    background: url('../img/viewNavbar.png');
+    background-size: cover;
+    margin: 0px;
+    display: flex;
+}
+
+.left-container{
+    width: 80%;
+    height: 100%;
+}
+
+.logo-container-div{
+    height: 60%;
+}
+
+.logo-img{
+    height: 100%;
+    width: auto;
+}
+
+.form-container{
+    display: flex;
+    justify-content: center;
+}
+
+.form{
+    width: 70%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.specific-search-div{
+    width: 80%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.search-value-general{
+    display: flex;
+    color: #29A4A4;
+}
+
+.search-value-container{
+    margin-left: 10px;
+    background-color: #F3EFEF;
+}
+
+.search-value{
+    border: none;
+    background-color: transparent;
+    padding-left: 10px;
+}
+
+.submit_btn{
+    background-color: transparent;
+    border: 0px;
+}
+
+#general_btn{
+    margin-left: 30px;
+    border: 3px solid black;
+    border-radius: 7px;
+    background-color: transparent;
+    font-weight: bold;
+}
+
+#general_btn:active{
+    box-shadow: 2px 2px 10px gray;
+}
+
+.right-container{
+    width: 20%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contact-items{
+    color: #29A4A4;
+    padding-left: 50px;
+    padding-right: 50px;
+    display: flex;
+    justify-content: space-around;
+}
+
+
+
+
+
+
+#response-div{
+    background: rgba(255, 255, 255, 0.9);
+    padding: 10px;
+    margin-right: 10px;
+    margin-top: 10px;
+    border-radius: 10px;
+    display: none;
+}
+
+.response-field-container{
+    display: flex;
+    margin-bottom: 5px;
+}
+
+.response-field-name{
+    font-weight: bold;
+}
+
+.response-field-value{
+    margin-left: 10px;
+}
+
+.marker-div-icon{
+    background-color: currentColor;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.charts-div-general{
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.chart{
+    height: 400px;
+    width: 500px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid black;
+    border-radius: 10px;
+}
