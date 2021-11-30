@@ -1,45 +1,11 @@
-const express = require('express');
-const dotenv = require('dotenv');
+const express = require('express')
+const router = express.Router();
 const bcryptjs = require('bcryptjs');
-const session = require('express-session')
-const moment = require('moment');
-const app = express();
-const port = 3000;
-//Configuration
-app.use(express.urlencoded({extended:false}));
-app.use(express.json());
-app.use('/resources',express.static('public'));
-app.use('/resources',express.static(__dirname+'/public/views'));
-app.use(session({
-    secret: '12345',
-    resave: true,
-    saveUninitialized: true
-}))
-app.set('view engine','ejs');
-dotenv.config({path:'./env/.env'});
+const connection = require('../database/db')
+/* const PacientesController = require ('../Controller/Pacient_controller') */
 
 
-app.get('/',(req,res)=>{
-    if(req.session.loggedin){
-        res.render('index',{
-            login:true,
-            name:req.session.name.charAt(0).toUpperCase() + req.session.name.slice(1),
-            rol: req.session.rolName
-        })
-    }
-    else{
-        res.render('index',{
-            login:false,
-            name:'Debe iniciar sesion'
-        })
-    }
-})
-
-app.get('/login',(req,res)=>{
-    res.render('login');
-})
-
-app.get('/register',(req,res)=>{
+router.get('/register',(req,res)=>{
     if(req.session.loggedin && req.session.rol==0){
         res.render('register');
     }
@@ -49,7 +15,7 @@ app.get('/register',(req,res)=>{
     
 })
 
-app.get('/registerCase',(req,res)=>{
+router.get('/registerCase',(req,res)=>{
     if(req.session.loggedin && req.session.rol==3){
         res.render('registerCase');
     }
@@ -58,113 +24,34 @@ app.get('/registerCase',(req,res)=>{
     }
 })
 
-app.get('/Gestionar',(rep,res) => {
-    connection.query('SELECT first_name as Nombre, Last_name as Apellido, Patient_id as Cedula, Case_id as IDCaso FROM MOCK_DATA ORDER BY Case_id',(error, result)=>{
-        if(result){
-            res.render('Gestion',{
-                Datos: {},
-                Buscar_Datos: result}); 
-                able = 1; 
-            }
-            if(error){
-            console.log(error);
-        }
-    });
-});
-
-app.post('/search',(req,res) => {
-    if (req.body.nombre == '' && req.body.id_Paciente=='' && req.body.cedula == ''){
-        connection.query('SELECT P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula FROM MOCK_DATA as P',[req.body.nombre,req.body.id_Paciente,req.body.cedula],(error, result)=>{
-            if(result){   
-                res.render('Gestion',{
-                    Datos: {},
-                    Buscar_Datos: result});
-                    able = 1;
-                }
-            if(error){
-                console.log(error);
-            }
-        
-        });
-    }
-    else{
-        connection.query('SELECT P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula FROM MOCK_DATA as P WHERE ( P.first_name=? or P.Case_id=? or P.Patient_id=?)',[req.body.nombre,req.body.id_Paciente,req.body.cedula],(error, result)=>{
-            if(result){   
-                console.log(result)
-                res.render('Gestion',{
-                    Datos: {},
-                    Buscar_Datos: result});
-                    able = 1;
-                }
-            if(error){
-                console.log(error);
-            }
-        
-        });
-    }
-});
-
-app.get('/selected/:id', (req,res) => {
-    const IDCaso = req.params.id;
-
-    connection.query('SELECT first_name as Nombre, Last_name as Apellido, Patient_id as Cedula, Case_id as IDCaso FROM MOCK_DATA WHERE Case_id = ? ORDER BY Case_id',[IDCaso],(error, result)=>{
-        if(result){
-            Buscar_Datos = result;
-            able = 1;
-        }  
-        if(error){
-            console.log(error);
-        }
-    });
-    
-    
-    connection.query('SELECT FechaMod as Fecha, P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula, E.Estado as EstadoNum, ES.Estados as Estado FROM MOCK_DATA as P, EstadoPacientes as E, Estados as ES WHERE P.Case_id=? and E.Cedula=P.Patient_id and E.Estado=ES.idEstados ORDER BY E.FechaMod',[IDCaso], (error,result) => {
-        if(result){
-            for (var i =0; i< result.length; i++) {
-                if(result[i].EstadoNum == 5){able=0; console.log('desabled'); break;}else{able=1}
-            }
-            res.render('Gestion',{
-                Datos: result
-            });
-        }
-        if(error){
-            console.log(error)
-        }
-        
-    })
-
-});
-
-app.post('/updated/:id', (req,res) => {
-    const {estado} = req.body;
-    console.log(estado)
-    const IDCaso = req.params.id;
-    connection.query('INSERT INTO `EstadoPacientes` (`Cedula`,`Estado`) VALUES ((SELECT Patient_id FROM MOCK_DATA WHERE Case_id=?),?)',[IDCaso,estado],(error, result) => {
-        if(result){
-            res.redirect('/selected/'+IDCaso)
-        }
-        if(error){
-            console.log(error);
-        }
-    })
-})
-
-app.get('/modifyCase',(req,res)=>{
+router.get('/modifyCase',(req,res)=>{
     if(req.session.loggedin && req.session.rol==3){
-        res.redirect('/Gestionar');
+        res.render('Gestion');
     }
     else{
         res.redirect('/')
     }
 })
 
-app.get('/logout',(req,res)=>{
+/* router.get('/Gestionar', PacientesController.list);
+
+router.post('/search', PacientesController.search);
+
+router.get('/selected/:id', PacientesController.select);
+
+router.post('/updated/:id', PacientesController.update);*/
+
+router.get('/login',(req,res)=>{
+    res.render('login');
+}) 
+
+router.get('/logout',(req,res)=>{
     req.session.destroy(()=>{
         res.redirect('/')
     })
 })
 
-app.get('/view',(req,res)=>{
+router.get('/view',(req,res)=>{
     if(req.session.loggedin && req.session.rol==2){
         res.render('view');
     }
@@ -174,7 +61,7 @@ app.get('/view',(req,res)=>{
     
 })
 
-app.get('/getById', function(req, resp){
+router.get('/getById', function(req, resp){
     const cc = req.query.patient_id;
     const id_caso = req.query.case_id;
     console.log(cc);
@@ -222,7 +109,7 @@ app.get('/getById', function(req, resp){
     }
 });
 
-app.get('/getGeneral', function(req, resp){
+router.get('/getGeneral', function(req, resp){
     connection.query(`SELECT * FROM MOCK_DATA
     JOIN states ON MOCK_DATA.Case_id = states.Case_id`, function(error, data){
         if(error){
@@ -254,7 +141,7 @@ app.get('/getGeneral', function(req, resp){
     });
 });
 
-app.get('/getChartData', function(req, resp){
+router.get('/getChartData', function(req, resp){
     connection.query(`SELECT * FROM states`, function(error, data){
         if(error){
             console.log("Error geting all states data: ", error);
@@ -274,7 +161,7 @@ app.get('/getChartData', function(req, resp){
     });
 });
 
-app.post('/register', async (req,res)=>{
+router.post('/register', async (req,res)=>{
     const user = req.body.user;
     const pass = req.body.password;
     const name = req.body.name;
@@ -326,7 +213,7 @@ app.post('/register', async (req,res)=>{
     }
 })
 
-app.post('/auth', async(req,res)=>{
+router.post('/auth', async(req,res)=>{
     const user = req.body.user;
     const pass = req.body.password;
     let passHash = await bcryptjs.hash(pass,8);
@@ -381,9 +268,7 @@ app.post('/auth', async(req,res)=>{
             ruta:'login'
         })
     }
-}) 
-app.listen(port,(req,res)=>{
-    console.log('Server on port', port);
 })
 
-const connection = require('./database/db')
+
+module.exports = router;
