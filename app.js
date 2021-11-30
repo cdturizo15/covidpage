@@ -5,6 +5,7 @@ const session = require('express-session')
 const moment = require('moment');
 const app = express();
 const port = 3000;
+
 //Configuration
 app.use(express.urlencoded({extended:false}));
 app.use(express.json());
@@ -17,6 +18,7 @@ app.use(session({
 }))
 app.set('view engine','ejs');
 dotenv.config({path:'./env/.env'});
+
 
 
 app.get('/',(req,res)=>{
@@ -56,106 +58,7 @@ app.get('/registerCase',(req,res)=>{
     else{
         res.redirect('/')
     }
-})
-
-app.get('/Gestionar',(rep,res) => {
-    connection.query('SELECT first_name as Nombre, Last_name as Apellido, Patient_id as Cedula, Case_id as IDCaso FROM MOCK_DATA ORDER BY Case_id',(error, result)=>{
-        if(result){
-            res.render('Gestion',{
-                Datos: {},
-                Buscar_Datos: result}); 
-                able = 1; 
-            }
-            if(error){
-            console.log(error);
-        }
-    });
-});
-
-app.post('/search',(req,res) => {
-    if (req.body.nombre == '' && req.body.id_Paciente=='' && req.body.cedula == ''){
-        connection.query('SELECT P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula FROM MOCK_DATA as P',[req.body.nombre,req.body.id_Paciente,req.body.cedula],(error, result)=>{
-            if(result){   
-                res.render('Gestion',{
-                    Datos: {},
-                    Buscar_Datos: result});
-                    able = 1;
-                }
-            if(error){
-                console.log(error);
-            }
-        
-        });
-    }
-    else{
-        connection.query('SELECT P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula FROM MOCK_DATA as P WHERE ( P.first_name=? or P.Case_id=? or P.Patient_id=?)',[req.body.nombre,req.body.id_Paciente,req.body.cedula],(error, result)=>{
-            if(result){   
-                console.log(result)
-                res.render('Gestion',{
-                    Datos: {},
-                    Buscar_Datos: result});
-                    able = 1;
-                }
-            if(error){
-                console.log(error);
-            }
-        
-        });
-    }
-});
-
-app.get('/selected/:id', (req,res) => {
-    const IDCaso = req.params.id;
-
-    connection.query('SELECT first_name as Nombre, Last_name as Apellido, Patient_id as Cedula, Case_id as IDCaso FROM MOCK_DATA WHERE Case_id = ? ORDER BY Case_id',[IDCaso],(error, result)=>{
-        if(result){
-            Buscar_Datos = result;
-            able = 1;
-        }  
-        if(error){
-            console.log(error);
-        }
-    });
     
-    
-    connection.query('SELECT FechaMod as Fecha, P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula, E.Estado as EstadoNum, ES.Estados as Estado FROM MOCK_DATA as P, EstadoPacientes as E, Estados as ES WHERE P.Case_id=? and E.Cedula=P.Patient_id and E.Estado=ES.idEstados ORDER BY E.FechaMod',[IDCaso], (error,result) => {
-        if(result){
-            for (var i =0; i< result.length; i++) {
-                if(result[i].EstadoNum == 5){able=0; console.log('desabled'); break;}else{able=1}
-            }
-            res.render('Gestion',{
-                Datos: result
-            });
-        }
-        if(error){
-            console.log(error)
-        }
-        
-    })
-
-});
-
-app.post('/updated/:id', (req,res) => {
-    const {estado} = req.body;
-    console.log(estado)
-    const IDCaso = req.params.id;
-    connection.query('INSERT INTO `EstadoPacientes` (`Cedula`,`Estado`) VALUES ((SELECT Patient_id FROM MOCK_DATA WHERE Case_id=?),?)',[IDCaso,estado],(error, result) => {
-        if(result){
-            res.redirect('/selected/'+IDCaso)
-        }
-        if(error){
-            console.log(error);
-        }
-    })
-})
-
-app.get('/modifyCase',(req,res)=>{
-    if(req.session.loggedin && req.session.rol==3){
-        res.redirect('/Gestionar');
-    }
-    else{
-        res.redirect('/')
-    }
 })
 
 app.get('/logout',(req,res)=>{
@@ -221,6 +124,8 @@ app.get('/getById', function(req, resp){
         }
     }
 });
+
+
 
 app.get('/getGeneral', function(req, resp){
     connection.query(`SELECT * FROM MOCK_DATA
@@ -419,7 +324,10 @@ app.post('/auth', async(req,res)=>{
             ruta:'login'
         })
     }
-}) 
+})
+
+
+
 app.listen(port,(req,res)=>{
     console.log('Server on port', port);
 })
