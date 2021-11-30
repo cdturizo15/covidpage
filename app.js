@@ -274,6 +274,44 @@ app.get('/getChartData', function(req, resp){
     });
 });
 
+app.post('/registerCase', async (req,res)=>{
+    const name = req.body.name;
+    const lastName = req.body.lastName;
+    const cedula = req.body.cedula;
+    const gender = req.body.gender;
+    const birthday = req.body.birthday;
+    const addressHome = req.body.addressHome;
+    const addressWork = req.body.addressWork;
+    const examDate = req.body.examDate;
+    const examState = req.body.examState;
+    connection.query('INSERT INTO MOCK_DATA SET ?',{
+        first_name:name,
+        Last_name:lastName,
+        Patient_id:cedula,
+        Gender:gender,
+        Birth_date:birthday,
+        Address:addressHome,
+        Job_Address:addressWork,
+        exam_date:examDate,
+        exam_state:examState
+    }, async(error,results)=>{
+        if(error){
+            console.log(error);
+        }else{
+            res.render("registerCase",{
+                alert:true,
+                alertTitle: "Registro",
+                alertMessage: "Registrado con éxito",
+                alertIcon: "success",
+                showConfirmButton:false,
+                timer:1500,
+                ruta: ''
+            })
+        }
+    })
+    
+})
+
 app.post('/register', async (req,res)=>{
     const user = req.body.user;
     const pass = req.body.password;
