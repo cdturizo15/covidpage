@@ -142,13 +142,15 @@ function getByOne(){
                         var datesList = getDatesList(response.data);
                         responseName.innerHTML = data.first_name;
                         responseId.innerHTML = data.Patient_id;
-                        responseGender.innerHTML = data.Gender;
+                        if(data.Gender==1){
+                            responseGender.innerHTML = 'Masculino'; 
+                        }
+                        if(data.Gender==2){
+                            responseGender.innerHTML = 'Femenino'; 
+                        }
                         responseBirth.innerHTML = data.Birth_date.split('T')[0];
                         responseAddress.innerHTML = data.Address;
                         responseJob.innerHTML = data.Job_Address;
-                        responseResult.innerHTML = num2state(data.State);
-                        responseResDate.innerHTML = data.Date.split('T')[0];
-                        responseCase.innerHTML = data.Case_id;//lat1,long1
 
                         var addrLat = data.Address_coords.split(',')[0]
                         var addrLng = data.Address_coords.split(',')[1]
@@ -187,13 +189,41 @@ function getByOne(){
                             }
                             addMapMarker(jobLat, jobLng, 0, msg);
                         }
-                    }else{
+                        tabla = document.getElementById("tabla-historial");
+                        tabla.innerHTML = ''
+                        if(tabla.innerHTML==''){
+                            template = `<tr>
+                            <th>Fecha de actualizacion</th>
+                            <th>ID caso</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Cedula</th>
+                            <th>Estado</th>
+                            </tr>`
+                            tabla.innerHTML += template  
+                        }
+                        for (let i = 0; i < response.result.length; i++) {
+                            tabla = document.getElementById("tabla-historial");
+                            template = `<tr>
+                            <td>${response.result[i].Fecha}</td>
+                            <td>${response.result[i].IDCaso}</td>
+                            <td>${response.result[i].Nombre}</td>
+                            <td>${response.result[i].Apellido}</td>
+                            <td>${response.result[i].Cedula}</td>
+                            <td>${response.result[i].Estado}</td>
+                            </tr>`
+                            tabla.innerHTML += template                        
+                        }
+                    }
+                    
+                    else{
                         alert("There is no data for this ID...");
                     }
+
                 }else{
                     alert(response.message);
                 }
-            }
+            }  
         }
         http.send(null);
     }

@@ -69,7 +69,8 @@ app.get('/logout',(req,res)=>{
 
 app.get('/view',(req,res)=>{
     if(req.session.loggedin && req.session.rol==2){
-        res.render('view');
+        res.render('view',Datos={});
+        
     }
     else{
         res.redirect('/')
@@ -94,6 +95,15 @@ app.get('/getById', function(req, resp){
                 resp.send({'status': 1, 'data': data});
             }
         });
+        connection.query('SELECT E.FechaMod as Fecha, P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula, E.Estado as EstadoNum, ES.Estados as Estado FROM MOCK_DATA as P, EstadoPacientes as E, Estados as ES WHERE P.Case_id=? and E.Cedula=P.Patient_id and E.Estado=ES.idEstados ORDER BY E.FechaMod',[id_caso], (error,result) => {
+            if(result){
+                resp.send({'status': 1, 'result': result});
+            }
+            if(error){
+                console.log(error)
+            }
+    
+        })
     }else{
         if(cc){
             connection.query(`SELECT * FROM MOCK_DATA
@@ -102,10 +112,18 @@ app.get('/getById', function(req, resp){
                     console.log("Error trying to get by cc: ", error);
                     resp.send({'status': 0, 'message': 'Error trying to get by cc...'});
                 }else{
-                    console.log(data);
-                    resp.send({'status': 1, 'data': data});
+                    connection.query('SELECT E.FechaMod as Fecha, P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula, E.Estado as EstadoNum, ES.Estados as Estado FROM MOCK_DATA as P, EstadoPacientes as E, Estados as ES WHERE P.Case_id=? and E.Cedula=P.Patient_id and E.Estado=ES.idEstados ORDER BY E.FechaMod',[id_caso], (error,result) => {
+                        if(result){
+                            resp.send({'status': 1, 'data': data, 'result': result});
+                        }
+                        if(error){
+                            console.log(error)
+                        }
+                
+                    })
                 }
             }); 
+            
         }
 
         if(id_caso){
@@ -115,7 +133,15 @@ app.get('/getById', function(req, resp){
                     console.log("Error trying to get by id_caso: ", error);
                     resp.send({'status': 0, 'message': 'Error trying to get id_caso...'});
                 }else{
-                    resp.send({'status': 1, 'data': data});
+                    connection.query('SELECT E.FechaMod as Fecha, P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula, E.Estado as EstadoNum, ES.Estados as Estado FROM MOCK_DATA as P, EstadoPacientes as E, Estados as ES WHERE P.Case_id=? and E.Cedula=P.Patient_id and E.Estado=ES.idEstados ORDER BY E.FechaMod',[id_caso], (error,result) => {
+                        if(result){
+                            resp.send({'status': 1, 'data': data, 'result': result});
+                        }
+                        if(error){
+                            console.log(error)
+                        }
+                
+                    })
                 }
             });
         }
@@ -130,6 +156,7 @@ app.get('/getGeneral', function(req, resp){
             resp.send({'status': 0, 'message': "Error trying to get general data..."});
         }else{
             //Todo esto es para obtener el último estado de cada paciente.
+            console.log(resp)
             var finalArray = new Array();
             for(var row of data){
                 var found = false;
@@ -272,11 +299,12 @@ app.get('/selected/:id', (req,res) => {
     });
 
 
-    connection.query('SELECT FechaMod as Fecha, P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula, E.Estado as EstadoNum, ES.Estados as Estado FROM MOCK_DATA as P, EstadoPacientes as E, Estados as ES WHERE P.Case_id=? and E.Cedula=P.Patient_id and E.Estado=ES.idEstados ORDER BY E.FechaMod',[IDCaso], (error,result) => {
+    connection.query('SELECT E.FechaMod as Fecha, P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula, E.Estado as EstadoNum, ES.Estados as Estado FROM MOCK_DATA as P, EstadoPacientes as E, Estados as ES WHERE P.Case_id=? and E.Cedula=P.Patient_id and E.Estado=ES.idEstados ORDER BY E.FechaMod',[IDCaso], (error,result) => {
         if(result){
             for (var i =0; i< result.length; i++) {
                 if(result[i].EstadoNum == 5){able=0; console.log('desabled'); break;}else{able=1}
             }
+            console.log(result)
             res.render('Gestion',{
                 Datos: result
             });

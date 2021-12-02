@@ -54,12 +54,13 @@
                                 </div>
                             </div>
                             <button id="general_btn">General</button>
+                            <a href="/" type="submit" id="general_btn">Volver</a>
                         </div>
                     </div>
                 </div>
             </div>
             <!--Aquí termina el encabezado-->
-            <div id="mapa" style="height:80vh; margin-top: 10px;">
+            <div id="mapa" style="height:50vh; margin-top: 10px;">
                 <div id="response-div" class="leaflet-top leaflet-right">
                     <div class="response-field-container">
                         <div class="response-field-name">First name:</div>
@@ -85,19 +86,23 @@
                         <div class="response-field-name">Job address:</div>
                         <div id="response-job_address" class="response-field-value"></div>
                     </div>
-                    <div class="response-field-container">
-                        <div class="response-field-name">Last state:</div>
-                        <div id="response-result" class="response-field-value"></div>
-                    </div>
-                    <div class="response-field-container">
-                        <div class="response-field-name">Test date:</div>
-                        <div id="response-result_date" class="response-field-value"></div>
-                    </div>
-                    <div class="response-field-container">
-                        <div class="response-field-name">Case ID:</div>
-                        <div id="response-caseId" class="response-field-value"></div>
-                    </div>
                 </div>
+            </div>
+            <div class = "col-12 col-md 6 overflow-scroll" style="height: 250px">
+                <table class="table table-striped" id="tabla-historial">
+                    <tr>
+                        <th>Fecha de actualizacion</th>
+                        <th>ID caso</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Cedula</th>
+                        <th>Estado</th>
+                    </tr>
+                        <% for (var i =0; i< Datos.length; i++) { %>
+                        <tr>
+                        </tr>
+                        <% } %>
+                </table>
             </div>
             
         </div>
