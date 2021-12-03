@@ -104,6 +104,7 @@ app.get('/getById', function(req, resp){
     
         })
     }else{
+        
         if(cc){
             connection.query(`SELECT * FROM MOCK_DATA
             WHERE Patient_id = '${cc}'`, function(error, data){
@@ -111,8 +112,9 @@ app.get('/getById', function(req, resp){
                     console.log("Error trying to get by cc: ", error);
                     resp.send({'status': 0, 'message': 'Error trying to get by cc...'});
                 }else{
-                    connection.query('SELECT E.FechaMod as Fecha, P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula, E.Estado as EstadoNum, ES.Estados as Estado FROM MOCK_DATA as P, EstadoPacientes as E, Estados as ES WHERE P.Case_id=? and E.Cedula=P.Patient_id and E.Estado=ES.idEstados ORDER BY E.FechaMod',[id_caso], (error,result) => {
+                    connection.query('SELECT E.FechaMod as Fecha, P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula, E.Estado as EstadoNum, ES.Estados as Estado FROM MOCK_DATA as P, EstadoPacientes as E, Estados as ES WHERE P.Case_id=(SELECT Case_id FROM MOCK_DATA WHERE Patient_id=?) and E.Cedula=P.Patient_id and E.Estado=ES.idEstados ORDER BY E.FechaMod',[cc], (error,result) => {
                         if(result){
+                            console.log(result)
                             resp.send({'status': 1, 'data': data, 'result': result});
                         }
                         if(error){
@@ -158,7 +160,7 @@ app.get('/getGeneral', function(req, resp){
             for (let j = 0; j < idcases.length; j++) {
                 var element = idcases[j].Case_id;
                 connection.query(`SELECT * FROM EstadoPacientes as E, MOCK_DATA as M WHERE E.Cedula=M.Patient_id 
-                    and id=? ORDER BY FechaMod DESC LIMIT 1`,[element], function(error, data){
+                    and Case_id=? ORDER BY FechaMod DESC LIMIT 1`,[element], function(error, data){
                     if(error){
                         console.log(error);
                         resp.send({'status': 0, 'message': "Error trying to get general data..."});
@@ -344,7 +346,7 @@ app.get('/selected/:id', (req,res) => {
     });
 
 
-    connection.query('SELECT E.FechaMod as Fecha, P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula, E.Estado as EstadoNum, ES.Estados as Estado FROM MOCK_DATA as P, EstadoPacientes as E, Estados as ES WHERE P.Case_id=? and E.Cedula=P.Patient_id and E.Estado=ES.idEstados ORDER BY E.FechaMod',[IDCaso], (error,result) => {
+    connection.query(`SELECT CONVERT_TZ( FechaMod,'UTC','America/Bogota' ) as Fecha, P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula, E.Estado as EstadoNum, ES.Estados as Estado FROM MOCK_DATA as P, EstadoPacientes as E, Estados as ES WHERE P.Case_id=? and E.Cedula=P.Patient_id and E.Estado=ES.idEstados ORDER BY E.FechaMod`,[IDCaso], (error,result) => {
         if(result){
             for (var i =0; i< result.length; i++) {
                 if(result[i].EstadoNum == 5){able=0; console.log('desabled'); break;}else{able=1}

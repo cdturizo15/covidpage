@@ -202,6 +202,7 @@ function getByOne(){
                             </tr>`
                             tabla.innerHTML += template  
                         }
+                        console.log(response.result)
                         for (let i = 0; i < response.result.length; i++) {
                             tabla = document.getElementById("tabla-historial");
                             template = `<tr>
