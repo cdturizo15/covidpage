@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 const dotenv = require('dotenv');
 const bcryptjs = require('bcryptjs');
 const session = require('express-session')
@@ -238,31 +239,49 @@ app.post('/registerCase', async (req,res)=>{
     const addressWork = req.body.addressWork;
     const examDate = req.body.examDate;
     const examState = req.body.examState;
-    connection.query('INSERT INTO MOCK_DATA SET ?',{
-        first_name:name,
-        Last_name:lastName,
-        Patient_id:cedula,
-        Gender:gender,
-        Birth_date:birthday,
-        Address:addressHome,
-        Job_Address:addressWork,
-        exam_date:examDate,
-        exam_state:examState
-    }, async(error,results)=>{
-        if(error){
-            console.log(error);
-        }else{
-            res.render("registerCase",{
-                alert:true,
-                alertTitle: "Registro",
-                alertMessage: "Registrado con éxito",
-                alertIcon: "success",
-                showConfirmButton:false,
-                timer:1500,
-                ruta: ''
-            })
-        }
-    })
+    axios.all([
+        axios.get('https://nominatim.openstreetmap.org/search?format=json&country=Colombia&city=Barranquilla&q='+addressHome),
+        axios.get('https://nominatim.openstreetmap.org/search?format=json&country=Colombia&city=Barranquilla&q='+addressWork)
+    ])
+    .then(axios.spread((...obj)=> {
+        console.log(obj[0].data);
+        console.log(obj[1].data);
+        const addHome = obj[0].data;
+        const addWork = obj[1].data;
+        Address_coords = addHome[0].lat.concat(',',addHome[0].lon);
+        Job_coords = addWork[0].lat.concat(',',addWork[0].lon);
+        connection.query('INSERT INTO MOCK_DATA SET ?',{
+            first_name:name,
+            Last_name:lastName,
+            Patient_id:cedula,
+            Gender:gender,
+            Birth_date:birthday,
+            Address:addressHome,
+            Job_Address:addressWork,
+            exam_date:examDate,
+            exam_state:examState,
+            Address_coords:Address_coords,
+            Job_coords: Job_coords
+        }, async(error,results)=>{
+            if(error){
+                console.log(error);
+            }else{
+                res.render("registerCase",{
+                    alert:true,
+                    alertTitle: "Registro",
+                    alertMessage: "Registrado con éxito",
+                    alertIcon: "success",
+                    showConfirmButton:false,
+                    timer:1500,
+                    ruta: ''
+                })
+            }
+        })
+
+    }))    
+
+
+    
     
 })
 
