@@ -41,25 +41,25 @@ general_btn.addEventListener('click', function(e){
             if(response.status == 1){
                 var data = response.data;
                 removeAll();
-                for(var item of data){
+                for(var i=0; i<data.length; i++){
                     if(initSeted == false){
-                        var lat = item.Address_coords.split(',')[0];
-                        var lng = item.Address_coords.split(',')[1];
+                        var lat = data[i][0].Address_coords.split(',')[0];
+                        var lng = data[i][0].Address_coords.split(',')[1];
                         var msg = `
-                        <div><strong>Nombre:</strong> ${item.first_name}</div>
-                        <div><strong>ID paciente:</strong> ${item.Patient_id}</div>
-                        <div><strong>ID caso:</strong> ${item.Case_id}</div>
+                        <div><strong>Nombre:</strong> ${data[i][0].first_name}</div>
+                        <div><strong>ID paciente:</strong> ${data[i][0].Patient_id}</div>
+                        <div><strong>ID caso:</strong> ${data[i][0].Case_id}</div>
                         `
-                        initMap(lat, lng, item.State, msg);
+                        initMap(lat, lng, data[i][0].Estado, msg);
                     }else{
-                        var lat = item.Address_coords.split(',')[0];
-                        var lng = item.Address_coords.split(',')[1];
+                        var lat = data[i][0].Address_coords.split(',')[0];
+                        var lng = data[i][0].Address_coords.split(',')[1];
                         var msg = `
-                        <div><strong>Nombre:</strong> ${item.first_name}</div>
-                        <div><strong>ID paciente:</strong> ${item.Patient_id}</div>
-                        <div><strong>ID caso:</strong> ${item.Case_id}</div>
+                        <div><strong>Nombre:</strong> ${data[i][0].first_name}</div>
+                        <div><strong>ID paciente:</strong> ${data[i][0].Patient_id}</div>
+                        <div><strong>ID caso:</strong> ${data[i][0].Case_id}</div>
                         `
-                        addMapMarker(lat, lng, item.State, msg);
+                        addMapMarker(lat, lng, data[i][0].Estado, msg);
                     }
                 }
             }else{
@@ -234,7 +234,7 @@ function getDatesList(data){
     if(data.length > 0){
         for(var i=0; i<data.length - 1; i++){
             var item = data[i];
-            finalArray.push([num2state(item.State), item.Date.split('T')[0]]);
+            finalArray.push([num2state(item.Estado), item.FechaMod.split('T')[0]]);
         }
     }
     console.log(finalArray);

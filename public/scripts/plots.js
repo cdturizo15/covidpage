@@ -1,5 +1,5 @@
 const chart1 = document.getElementById('chart1').getContext('2d');
-                    const chart2 = document.getElementById('chart2').getContext('2d');
+const chart2 = document.getElementById('chart2').getContext('2d');
                     var chartData = new Array();
 
                     document.addEventListener('DOMContentLoaded', function(){
@@ -48,32 +48,54 @@ const chart1 = document.getElementById('chart1').getContext('2d');
                                     });
 
                                     //Llenar el PIE Data.
-                                    var pieData = new Object;
-                                    pieData.regist = 0;
-                                    pieData.dead = 0;
-                                    pieData.cured = 0;
-                                    pieData.treatment = 0;
-                                    pieData.uci = 0;
-
-                                    for(var item of chartData){
-                                        pieData.regist = Number(pieData.regist) + Number(item.regist);
-                                        pieData.dead = Number(pieData.dead) + Number(item.dead);
-                                        pieData.cured = Number(pieData.cured) + Number(item.cured);
-                                        pieData.treatment = Number(pieData.treatment) + Number(item.treatment);
-                                        pieData.uci = Number(pieData.uci) + Number(item.uci);
-                                    }
-                                    console.log("PIE DATA:");
-                                    console.log(pieData);
-
-                                    var array = [pieData.regist, pieData.deads, pieData.cured, pieData.treatment, pieData.uci];
+                                    var array1 = [response.QueryData1[0].Tratamiento, response.QueryData1[0].Muertos, response.QueryData1[0].Curados];
                                     var pieChart = new Chart(chart2, {
                                         type: 'pie',
                                         data: {
-                                            labels: ['Infectados', 'Muestes', 'Curados', 'Tratamiento', 'UCI'],
+                                            labels: ['Infectados', 'Muertes', 'Curados'],
+                                            datasets: [{
+                                                label: 'PIE Chart',
+                                                data: array1,
+                                                backgroundColor: ['blue', 'red', 'green']
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: false
+                                        }
+                                    });
+
+                                    var array2 = [response.QueryData2[0].Infectados, response.QueryData2[1].Infectados, response.QueryData2[2].Infectados, response.QueryData2[3].Infectados];
+                                    var pieChart = new Chart(chart3, {
+                                        type: 'pie',
+                                        data: {
+                                            labels: ['En tratamiento casa', 'En tratamiento', 'Hospital en UCI', 'Muertos'],
+                                            datasets: [{
+                                                label: 'PIE Chart',
+                                                data: array2,
+                                                backgroundColor: ['blue', 'red', 'green', 'purple']
+                                            }]
+                                        },
+                                        options: {
+                                            responsive: false
+                                        }
+                                    });
+                                    if (response.QueryData3.length==0){
+                                        var array = [];
+                                    }
+                                    if (response.QueryData3.length==1){
+                                        var array = [response.QueryData3[0].Resultado];    
+                                    }
+                                    if (response.QueryData3.length==2){
+                                        var array = [response.QueryData3[0].Resultado, response.QueryData3[1].Resultado];    
+                                    }
+                                    var pieChart = new Chart(chart4, {
+                                        type: 'pie',
+                                        data: {
+                                            labels: ['Casos Positivo', 'Casos Negativo'],
                                             datasets: [{
                                                 label: 'PIE Chart',
                                                 data: array,
-                                                backgroundColor: ['blue', 'red', 'green', 'purple', 'orange']
+                                                backgroundColor: ['blue', 'red']
                                             }]
                                         },
                                         options: {
@@ -93,14 +115,11 @@ const chart1 = document.getElementById('chart1').getContext('2d');
                         if(num == 0){
                             state = 'none';
                         }
-                        if(num == 1){
+                        if(num == 0){
                             state = 'negative';
                         }
-                        if(num == 2){
+                        if(num == 1 || num == 2 || num == 3){
                             state = 'treatment';
-                        }
-                        if(num == 3){
-                            state = 'uci';
                         }
                         if(num == 4){
                             state = 'cured';
@@ -124,7 +143,7 @@ const chart1 = document.getElementById('chart1').getContext('2d');
                                     cont++;
                                     object.regist = cont;
                                     found = true;
-                                    break;
+                                    break;x
                                 }
                             }
                             if(found == false){
@@ -141,3 +160,4 @@ const chart1 = document.getElementById('chart1').getContext('2d');
                             }
                         }
                     }
+

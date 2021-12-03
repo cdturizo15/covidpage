@@ -6,6 +6,7 @@ const moment = require('moment');
 const app = express();
 const port = 3000;
 
+
 //Configuration
 app.use(express.urlencoded({extended:false}));
 app.use(express.json());
@@ -81,8 +82,6 @@ app.get('/view',(req,res)=>{
 app.get('/getById', function(req, resp){
     const cc = req.query.patient_id;
     const id_caso = req.query.case_id;
-    console.log(cc);
-    console.log(id_caso);
 
     if(cc && id_caso){
         connection.query(`SELECT * FROM MOCK_DATA
@@ -91,13 +90,12 @@ app.get('/getById', function(req, resp){
                 console.log("Error trying to get by cc and id_caso: ", error);
                 resp.send({'status': 0, 'message': 'Error trying to get by cc and id_caso...'});
             }else{
-                console.log(data);
                 resp.send({'status': 1, 'data': data});
             }
         });
         connection.query('SELECT E.FechaMod as Fecha, P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula, E.Estado as EstadoNum, ES.Estados as Estado FROM MOCK_DATA as P, EstadoPacientes as E, Estados as ES WHERE P.Case_id=? and E.Cedula=P.Patient_id and E.Estado=ES.idEstados ORDER BY E.FechaMod',[id_caso], (error,result) => {
             if(result){
-                resp.send({'status': 1, 'result': result});
+                resp.send({'status': 1,  'data': data,'result': result});
             }
             if(error){
                 console.log(error)
@@ -149,54 +147,83 @@ app.get('/getById', function(req, resp){
 });
 
 app.get('/getGeneral', function(req, resp){
-    connection.query(`SELECT * FROM MOCK_DATA
-    JOIN states ON MOCK_DATA.Case_id = states.Case_id`, function(error, data){
+    var lastCases = []
+    connection.query(`SELECT Case_id FROM MOCK_DATA`, function(error, idcases){
         if(error){
             console.log(error);
             resp.send({'status': 0, 'message': "Error trying to get general data..."});
-        }else{
-            //Todo esto es para obtener el último estado de cada paciente.
-            console.log(resp)
-            var finalArray = new Array();
-            for(var row of data){
-                var found = false;
-                for(var i=0; i<finalArray.length; i++){
-                    var item = finalArray[i];
-                    if(item.Case_id == row.Case_id){
-                        if(moment(row.Date).diff(item.Date) > 0){
-                            finalArray[i] = row;
-                            found = true;
-                            break;
-                        }
+        }
+        else{      
+            for (let j = 0; j < idcases.length; j++) {
+                var element = idcases[j].Case_id;
+                connection.query(`SELECT * FROM EstadoPacientes as E, MOCK_DATA as M WHERE E.Cedula=M.Patient_id 
+                    and id=? ORDER BY FechaMod DESC LIMIT 1`,[element], function(error, data){
+                    if(error){
+                        console.log(error);
+                        resp.send({'status': 0, 'message': "Error trying to get general data..."});
                     }
-                }
-                if(found == false){
-                    finalArray.push(row);
-                }
-            }
-            console.log("RESPUESTA FINAL");
-            console.log(finalArray);
-            resp.send({'status': 1, 'data': finalArray});
+                    else{
+                        //Todo esto es para obtener el último estado de cada paciente.
+                        var finalArray = new Array();
+                        for(var row of data){
+                            var found = false;
+                            for(var i=0; i<finalArray.length; i++){
+                                var item = finalArray[i];
+                                if(item.Patient_id == row.Cedula){
+                                    if(moment(row.FechaMod).diff(item.FechaMod) > 0){
+                                        finalArray[i] = row;
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if(found == false){
+                                finalArray.push(row);
+                            }
+
+                        }
+                        if(finalArray != ''){
+                            lastCases.push(finalArray)  
+                        }
+                        
+                        if(j==idcases.length-1){
+                            resp.send({'status': 1, 'data': lastCases});  
+                        }                        
+                    }
+                });   
+            }    
         }
     });
+    
 });
 
 app.get('/getChartData', function(req, resp){
-    connection.query(`SELECT * FROM states`, function(error, data){
+    connection.query(`SELECT idEstadoPacientes as id, Cedula as Case_id, Estado as State, FechaMod as Date FROM EstadoPacientes`, function(error, data){
         if(error){
             console.log("Error geting all states data: ", error);
             resp.send({'status': 0, 'message': "Error geting all states data..."});
         }else{
-            if(data.length > 0){
-                var finalArray = new Array();
-                for(var item of data){
-                    var date = moment(item.Date).format('YYYY-MM-DD');
-                    finalArray.push([item.State, date]);
-                }
-                resp.send({'status': 1, 'data': finalArray});
-            }else{
-                resp.send({'status': 0, 'message': "No data found..."});
+            connection.query(`SELECT Tr.Tratamiento, De.Muertos, Cu.Curados FROM (SELECT COUNT(Estado) as Tratamiento FROM EstadoPacientes WHERE (Estado="1" or Estado="2" or Estado="3")) as Tr, (SELECT COUNT(Estado) as Muertos FROM EstadoPacientes WHERE (Estado="5")) as De, (SELECT COUNT(Estado) as Curados FROM EstadoPacientes WHERE (Estado="4")) as Cu`, function(error, result1){
+            if (result1){
+                connection.query(`SELECT Tr.Infectados FROM (SELECT COUNT(Estado) as Infectados FROM EstadoPacientes WHERE (Estado="1" or Estado="2" or Estado="3" or Estado="5") GROUP BY Estado) as Tr`, function(error, result2){
+                    if (result2){
+                        connection.query(`SELECT Tr.Resultado FROM (SELECT COUNT(exam_state) as Resultado FROM MOCK_DATA GROUP BY exam_state) as Tr`, function(error, result3){
+                            if (result3){        
+                        if(data.length > 0){
+                            var finalArray = new Array();
+                            for(var item of data){
+                                var date = moment(item.Date).format('YYYY-MM-DD');
+                                finalArray.push([item.State, date]);
+                            }
+                            resp.send({'status': 1, 'data': finalArray, QueryData1: result1, QueryData2: result2, QueryData3: result3});
+                        }else{
+                            resp.send({'status': 0, 'message': "No data found..."});
+                        }
+                    }})
+                }}
+                )
             }
+            })
         }
     });
 });
@@ -271,7 +298,6 @@ app.post('/search',(req,res) => {
     else{
         connection.query('SELECT P.Case_id as IDCaso, P.first_name as Nombre, P.Last_name as Apellido, P.Patient_id as Cedula FROM MOCK_DATA as P WHERE ( P.first_name=? or P.Case_id=? or P.Patient_id=?)',[req.body.nombre,req.body.id_Paciente,req.body.cedula],(error, result)=>{
             if(result){   
-                console.log(result)
                 res.render('Gestion',{
                     Datos: {},
                     Buscar_Datos: result});
@@ -304,7 +330,6 @@ app.get('/selected/:id', (req,res) => {
             for (var i =0; i< result.length; i++) {
                 if(result[i].EstadoNum == 5){able=0; console.log('desabled'); break;}else{able=1}
             }
-            console.log(result)
             res.render('Gestion',{
                 Datos: result
             });
@@ -319,7 +344,6 @@ app.get('/selected/:id', (req,res) => {
 
 app.post('/updated/:id', (req,res) => {
     const {estado} = req.body;
-    console.log(estado)
     const IDCaso = req.params.id;
     connection.query('INSERT INTO `EstadoPacientes` (`Cedula`,`Estado`) VALUES ((SELECT Patient_id FROM MOCK_DATA WHERE Case_id=?),?)',[IDCaso,estado],(error, result) => {
         if(result){
